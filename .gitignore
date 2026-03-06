@@ -1,0 +1,42 @@
+# Python 缓存与编译文件
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# 日志与临时文件
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# 数据与模型输出（本地大文件，不必提交）
+runs/
+logs/
+output/
+outputs/
+
+# PyTorch / 训练中间结果
+*.pth
+*.pt
+*.ckpt
+*.onnx
+
+# IDE / 编辑器配置
+.vscode/
+.idea/
+
+# Windows 系统文件
+Thumbs.db
+Desktop.ini
+
+# Jupyter / TensorBoard
+.ipynb_checkpoints/
+
