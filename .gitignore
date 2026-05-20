@@ -17,17 +17,24 @@ env/
 *.swp
 *.swo
 
-# 数据与模型输出（本地大文件，不必提交）
-runs/
+# 训练中产生的本地大目录 / 中间产物
+#   仓库已提交 runs/detect/train/ 作为 YOLOv8 训练证据，用白名单保留
 logs/
 output/
 outputs/
+runs/*
+!runs/detect/
+runs/detect/*
+!runs/detect/train/
 
-# PyTorch / 训练中间结果
-*.pth
-*.pt
+# 训练中间检查点（仓库已提交的发布权重 models/*.pt|*.onnx|*.pth 不会被波及，
+# 因为这里只忽略命名规则明显是中间产物的文件）
 *.ckpt
-*.onnx
+stage*_checkpoint_epoch_*.pth
+stage*_best_model.pth
+
+# 训练触发文件
+pause_training.txt
 
 # IDE / 编辑器配置
 .vscode/
@@ -39,4 +46,4 @@ Desktop.ini
 
 # Jupyter / TensorBoard
 .ipynb_checkpoints/
-
+events.out.tfevents.*

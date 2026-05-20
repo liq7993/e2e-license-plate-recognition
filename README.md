@@ -69,21 +69,49 @@ flowchart LR
 
 ```
 end-to-end/
-├── README.md                # 本文档
+├── README.md                # 本文档（中文）
 ├── README_EN.md             # 英文版 README
-├── requirements.txt         # Python 依赖（建议自行加版本号）
+├── LICENSE                  # MIT 许可（含第三方上游许可提示）
+├── requirements.txt         # Python 依赖（未锁版本）
 ├── .gitignore
+│
 ├── zhongduan.py             # 推理 + Tkinter GUI 程序（可直接运行）
 ├── xunlianzonghe.py         # 识别模型训练（4 阶段渐进式）
 ├── xunlianres2.py           # YOLOv8 检测训练（含 ONNX 导出）
-├── models/                  # 推理时加载的模型与字符映射
-│   ├── best.pt              # YOLOv8 检测权重
-│   ├── best.onnx            # YOLOv8 ONNX 导出
-│   ├── final_model.pth      # 识别模型权重
-│   └── chars_mapping.json   # 字符 ↔ 索引映射
+│
+├── models/                  # ★ 推理时实际加载的权重与字符映射
+│   ├── best.pt              #   YOLOv8 检测权重（推理用）
+│   ├── best.onnx            #   YOLOv8 ONNX 导出（推理用）
+│   ├── final_model.pth      #   识别模型权重（EnhancedCRNN）
+│   └── chars_mapping.json   #   字符 ↔ 索引映射
+│
+├── samples/                 # 演示用的示例图片目录（默认不内置图片，见目录内 README）
+│   └── README.md
+│
 └── runs/
-    └── detect/train/        # YOLOv8 训练产物（曲线、混淆矩阵、results.csv 等）
+    └── detect/train/        # ★ 留作训练证据的 YOLOv8 训练产物
+        ├── args.yaml        #   实际训练超参
+        ├── results.csv      #   每个 epoch 的 loss / 指标
+        ├── results.png
+        ├── PR_curve.png / F1_curve.png / P_curve.png / R_curve.png
+        ├── confusion_matrix.png / confusion_matrix_normalized.png
+        ├── labels.jpg / labels_correlogram.jpg
+        ├── train_batch*.jpg / val_batch*_pred.jpg / val_batch*_labels.jpg
+        └── weights/
+            ├── best.pt      #   该次训练的最佳权重（与 models/best.pt 是不同次训练）
+            └── best.onnx
 ```
+
+### `models/` 与 `runs/detect/train/weights/` 的区别
+
+仓库里有两个 `best.pt`，作用完全不同，不是冗余：
+
+| 路径 | 角色 | 谁会读它 |
+|---|---|---|
+| `models/best.pt` / `best.onnx` / `final_model.pth` | **推理时实际加载的权重** | `zhongduan.py` GUI |
+| `runs/detect/train/weights/best.pt` / `best.onnx` | **作为训练完成度证据保留的产物**，与 `results.csv`、各类曲线 PNG、混淆矩阵一起形成可复核的训练快照 | 仅供读者查看，不参与运行 |
+
+如果你只想跑 GUI，只需要 `models/` 目录下的四个文件；`runs/` 整个目录都可以删。
 
 ---
 
@@ -112,11 +140,12 @@ pip install -r requirements.txt
 
 ## 快速开始（推理 / GUI）
 
-最低运行需求：`models/` 目录下三件套齐全。
+最低运行需求：`models/` 目录下四件套齐全。
 
 ```
 models/
 ├── best.pt               # YOLOv8 检测模型
+├── best.onnx             # YOLOv8 ONNX（可选）
 ├── final_model.pth       # 识别模型 (EnhancedCRNN)
 └── chars_mapping.json    # 字符映射
 ```
@@ -129,7 +158,7 @@ python zhongduan.py
 
 界面操作：
 
-1. 点击 **加载图像**，选择一张包含车辆 / 车牌的图片。
+1. 点击 **加载图像**，选择一张包含车辆 / 车牌的图片（可以放到 `samples/` 下方便取用）。
 2. 点击 **识别车牌**：
    - 左侧画布会显示带检测框的原图；
    - 右侧画布会显示裁剪后的车牌区域；
@@ -217,13 +246,15 @@ type nul > pause_training.txt
 | 3 | 10 | + 去模糊辅助任务（多任务损失） |
 | 4 | 10 | 全模块联合微调 |
 
-输出物：
+输出物（写入 `OUTPUT_DIR`，不进仓库）：
 
 - `stageX_best_model.pth`：每阶段最佳权重
 - `stageX_checkpoint_epoch_K.pth`：训练中断恢复用
 - `chars_mapping.json`：字符映射，推理需要
 - `logs/`：TensorBoard 日志
 - `end_to_end_lpr.log`：训练日志
+
+发布时需要把最终的 `chars_mapping.json` 和一个收敛后的 `.pth` 重命名为 `final_model.pth` 放到本仓库的 `models/` 目录。
 
 ---
 
@@ -242,9 +273,7 @@ runs/detect/train/
 ├── train_batch*.jpg / val_batch*_pred.jpg / val_batch*_labels.jpg
 └── weights/
     ├── best.pt
-    ├── last.pt
-    ├── best.onnx
-    └── best_modified.onnx
+    └── best.onnx
 ```
 
 来自 `results.csv` 第 20 epoch（最终）的指标：
@@ -311,6 +340,7 @@ DIGITS    (10) : 0-9
 6. **数据集获取与目录格式说明偏简**：CCPD / BLPD 的下载与目录约定未在仓库内给出完整脚本。
 7. **GUI 中文字体硬编码 `SimHei`**，跨平台部署需要调整。
 8. **打包与发布**：未做 Docker 镜像 / PyInstaller 等部署形态。
+9. **三个主脚本各自较长**：`zhongduan.py` ~730 行 / `xunlianzonghe.py` ~1700 行，模型定义、数据加载、训练循环、GUI 都堆在单文件里，后续重构成包目录会更友好。
 
 ---
 
@@ -320,7 +350,9 @@ DIGITS    (10) : 0-9
 - [ ] `pip freeze` 出锁版本的 `requirements-lock.txt`
 - [ ] 增加 `eval.py`：在 BLPD val + CCPD blur/weather/tilt 上跑统一的字符级准确率 / 序列级准确率，并写入 README 表格
 - [ ] 增加 `infer.py`：CLI 单图 / 批量推理，支持输出 JSON
-- [ ] 提供示例图片与示例输出截图
+- [ ] 把识别模型定义从 `zhongduan.py` 抽到 `models/crnn.py`，让 GUI / CLI / 训练脚本共用同一份定义
+- [ ] 在 `samples/` 内放一组可公开演示的示例图片，并在 README 顶部加端到端识别效果截图
+- [ ] 补一节消融实验（STN on/off × Deblur on/off × Attention on/off）
 - [ ] 构建一个 FastAPI 简易 HTTP 服务（POST 一张图 → 返回检测 + 识别 JSON）
 - [ ] Dockerfile / GitHub Actions（lint + smoke test）
 - [ ] 多卡训练与 AMP 验证
@@ -346,7 +378,15 @@ DIGITS    (10) : 0-9
 
 ## License
 
-本项目以学习、研究与毕业设计展示为主要目的，建议默认采用 [MIT License](https://opensource.org/licenses/MIT) 授权（请在仓库根目录补充 `LICENSE` 文件）。第三方代码、模型与数据集的版权归原作者所有，请在使用本项目时一并遵守其许可协议。
+本项目主体代码采用 [MIT License](LICENSE)，可用于学习、研究与毕业设计展示。
+
+**第三方上游许可同时生效**，使用本项目时必须一并遵守：
+
+- **Ultralytics YOLOv8** 以 **AGPL-3.0** 发布。本仓库中 `models/best.pt`、`models/best.onnx`、`runs/detect/train/weights/*` 等基于 YOLOv8 训练得到的权重，及 `xunlianres2.py` 中对 Ultralytics API 的调用，均受 AGPL-3.0 约束；商用部署需自行向 Ultralytics 获取商用许可。
+- **CCPD2019 / CCPD2020、BLPD** 数据集的版权与许可归原数据集发布者所有，本仓库不再分发任何数据集图片。
+- MobileNetV3、STN、CRNN、CBAM 等学术工作的引用条款见各自论文 / 代码仓库。
+
+详见根目录 [LICENSE](LICENSE) 文件。
 
 ---
 
