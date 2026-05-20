@@ -54,9 +54,7 @@ flowchart LR
 
 链路上每一个中间结果（检测框、裁剪后的车牌、STN 仿射校正后的图像、去模糊分支输出、特征图）都会在 GUI 上显示，便于讲解与调试。
 
-> 📊 训练曲线总览见 [训练产物与已验证指标](#训练产物与已验证指标)。
-> 📷 GUI 运行截图与流程示意图占位于 [`docs/screenshots/`](docs/screenshots/)，
->    需要本地跑一遍 `python zhongduan.py` 后自行截图补入（避免泄露真实车牌）。
+> 📊 训练曲线总览与混淆矩阵见 [训练产物与已验证指标](#训练产物与已验证指标)。
 
 ---
 
@@ -98,9 +96,6 @@ end-to-end/
 │   └── chars_mapping.json   #   字符 ↔ 索引映射
 │
 ├── samples/                 # 演示用的示例图片目录（默认不内置图片，见目录内 README）
-│   └── README.md
-│
-├── docs/screenshots/        # 项目截图 / 流程示意图（待补，见目录内 README）
 │   └── README.md
 │
 └── runs/
@@ -319,12 +314,11 @@ runs/detect/train/
 | **mAP@0.5**       | **0.9940** |
 | **mAP@0.5:0.95**  | **0.7737** |
 
-训练曲线总览（从 `runs/detect/train/results.csv` 重新绘制；
-脚本见 [`docs/screenshots/_gen_training_overview.py`](docs/screenshots/_gen_training_overview.py)）：
+Ultralytics 自动汇总的训练曲线（loss + 指标，20 epoch）：
 
-![训练总览](docs/screenshots/training_overview.png)
+![training results](runs/detect/train/results.png)
 
-按类别的混淆矩阵（来自 Ultralytics 原始训练产物）：
+按类别的混淆矩阵与 PR 曲线（同样来自 Ultralytics 训练产物）：
 
 <p align="center">
   <img src="runs/detect/train/confusion_matrix_normalized.png" alt="normalized confusion matrix" width="48%" />
