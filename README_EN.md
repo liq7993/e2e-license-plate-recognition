@@ -171,7 +171,7 @@ In the window:
 
 ## Training
 
-> ⚠️ **Heads-up**: dataset paths and output directories in the training scripts are hard-coded to the author's local environment (`E:\CCPD2019`, `E:\BLPD`, `C:\Users\32044\Desktop\xunlianrcnn`, etc.). External users **must** edit them before running.
+> ℹ️ **Path configuration**: defaults inside the training scripts still point to the author's machine (`E:\CCPD2019`, `E:\BLPD`, `C:\Users\32044\Desktop\xunlianrcnn`, etc.) as placeholders. External users **just need to override the environment variables below** — no source edits required.
 
 ### 1. Datasets
 
@@ -182,41 +182,60 @@ This project uses two public datasets:
 
 Datasets are **not** redistributed in this repo. Please obtain them from the original sources.
 
-### 2. Train the YOLOv8 detector
+### 2. Environment variables (override default paths)
 
-Edit the following fields in `xunlianres2.py`:
+| Env var | Purpose | Used by |
+|---|---|---|
+| `YOLO_DATASET_PATH` | YOLO-format dataset root (must contain `data.yaml`) | `xunlianres2.py` |
+| `YOLO_INIT_WEIGHTS` | Starting weights for YOLOv8 training (e.g. `yolov8n.pt`) | `xunlianres2.py` |
+| `YOLO_TRAIN_PROJECT` | YOLOv8 output project dir (Ultralytics `project=`) | `xunlianres2.py` |
+| `BLPD_DIR` | BLPD dataset root | `xunlianzonghe.py` |
+| `BLPD_TRAIN_TXT` | BLPD train list; defaults to `$BLPD_DIR/train.txt` | `xunlianzonghe.py` |
+| `BLPD_VAL_TXT` | BLPD val list; defaults to `$BLPD_DIR/val.txt` | `xunlianzonghe.py` |
+| `CCPD_BASE_DIR` | CCPD2019 root (script joins `blur/weather/tilt` internally) | `xunlianzonghe.py` |
+| `YOLO_MODEL_PATH` | Trained YOLOv8 weights to crop plates during recognition training | `xunlianzonghe.py` |
+| `OUTPUT_DIR` | Output dir for artifacts / logs / checkpoints | `xunlianzonghe.py` |
 
-- `dataset_path` — your local YOLO-format dataset root (must contain `data.yaml`, `train/images`, `val/images`, ...).
-- `model_path` — starting weights (e.g. official `yolov8n.pt`).
-- `project` / `name` — output directory.
+If unset, the hard-coded defaults in each script are used.
 
-Then:
+### 3. Train the YOLOv8 detector
 
 ```bash
+# Windows PowerShell
+$env:YOLO_DATASET_PATH = "D:\datasets\CCPD2019\yolo_dataset"
+$env:YOLO_INIT_WEIGHTS = "D:\weights\yolov8n.pt"
+$env:YOLO_TRAIN_PROJECT = "D:\runs\plate_detect"
+python xunlianres2.py
+
+# Linux / macOS
+YOLO_DATASET_PATH=/data/CCPD2019/yolo_dataset \
+YOLO_INIT_WEIGHTS=/weights/yolov8n.pt \
+YOLO_TRAIN_PROJECT=/runs/plate_detect \
 python xunlianres2.py
 ```
 
 The script trains, validates, and exports an ONNX file.
 
-### 3. Train the recognition model (4-stage progressive)
-
-Edit the path block at the top of `xunlianzonghe.py`:
-
-```python
-BLPD_DIR        = r"E:\BLPD"
-BLPD_TRAIN_TXT  = r"E:\BLPD\train.txt"
-BLPD_VAL_TXT    = r"E:\BLPD\val.txt"
-CCPD_BASE_DIR   = r"E:\CCPD2019\CCPD2019"
-YOLO_MODEL_PATH = r"...\YOLOv8_finetuned\...\best.pt"
-OUTPUT_DIR      = r"C:\Users\32044\Desktop\xunlianrcnn"
-```
-
-Run:
+### 4. Train the recognition model (4-stage progressive)
 
 ```bash
-# Train through all 4 stages from scratch
+# Windows PowerShell
+$env:BLPD_DIR = "D:\datasets\BLPD"
+$env:CCPD_BASE_DIR = "D:\datasets\CCPD2019"
+$env:YOLO_MODEL_PATH = "D:\runs\plate_detect\exp\weights\best.pt"
+$env:OUTPUT_DIR = "D:\runs\plate_recog"
 python xunlianzonghe.py
 
+# Linux / macOS
+BLPD_DIR=/data/BLPD CCPD_BASE_DIR=/data/CCPD2019 \
+YOLO_MODEL_PATH=/runs/plate_detect/exp/weights/best.pt \
+OUTPUT_DIR=/runs/plate_recog \
+python xunlianzonghe.py
+```
+
+Supported CLI flags:
+
+```bash
 # Start from a specific stage
 python xunlianzonghe.py --stage 3
 
@@ -332,7 +351,7 @@ Enabling STN + deblur + attention from epoch 0 lets an unconverged STN affine ma
 
 Honest boundaries for the undergraduate open-source release:
 
-1. **Hard-coded absolute paths** — `xunlianzonghe.py` / `xunlianres2.py` still embed `E:\` and `C:\` paths from the author's machine. Third parties must edit the source or wait for a YAML-based config refactor.
+1. **Default paths still point to the author's machine** — `xunlianzonghe.py` / `xunlianres2.py` now support environment-variable overrides (see the table above), but the hard-coded fallbacks remain `E:\` / `C:\` paths. A YAML-based config refactor is still a planned next step.
 2. **No version pinning** — `requirements.txt` lists package names only; a `pip freeze` snapshot is still pending.
 3. **No unified recognition benchmark** — no script reports character / sequence accuracy, so the README does not claim a recognition number.
 4. **No unit or integration tests.**

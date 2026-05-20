@@ -55,22 +55,36 @@ logger.info("脚本开始执行")
 logger.info(f"命令行参数: {args}")
 
 # ======== 路径配置 ========
+# 以下路径均可通过同名环境变量覆盖，避免改源码即可在不同机器上跑：
+#   BLPD_DIR / BLPD_TRAIN_TXT / BLPD_VAL_TXT
+#   CCPD_BASE_DIR
+#   YOLO_MODEL_PATH
+#   OUTPUT_DIR
+# 例如 (Windows PowerShell)：
+#   $env:BLPD_DIR="D:\datasets\BLPD"; $env:CCPD_BASE_DIR="D:\datasets\CCPD2019"
+#   python xunlianzonghe.py
+# Linux / macOS：
+#   BLPD_DIR=/data/BLPD CCPD_BASE_DIR=/data/CCPD2019 python xunlianzonghe.py
+
 # 原始BLPD数据集路径
-BLPD_DIR = r"E:\BLPD"  
-BLPD_TRAIN_TXT = r"E:\BLPD\train.txt"
-BLPD_VAL_TXT = r"E:\BLPD\val.txt"
+BLPD_DIR = os.environ.get("BLPD_DIR", r"E:\BLPD")
+BLPD_TRAIN_TXT = os.environ.get("BLPD_TRAIN_TXT", os.path.join(BLPD_DIR, "train.txt"))
+BLPD_VAL_TXT = os.environ.get("BLPD_VAL_TXT", os.path.join(BLPD_DIR, "val.txt"))
 
 # CCPD2019数据集路径
-CCPD_BASE_DIR = r"E:\CCPD2019\CCPD2019"
+CCPD_BASE_DIR = os.environ.get("CCPD_BASE_DIR", r"E:\CCPD2019\CCPD2019")
 CCPD_BLUR_DIR = os.path.join(CCPD_BASE_DIR, "blur")
 CCPD_WEATHER_DIR = os.path.join(CCPD_BASE_DIR, "weather")
 CCPD_TILT_DIR = os.path.join(CCPD_BASE_DIR, "tilt")
 
 # YOLOv8训练好的模型路径
-YOLO_MODEL_PATH = r"E:\CCPD2019\CCPD2019\YOLOv8_finetuned\finetune_ccpd2019_fixed\weights\best.pt"
+YOLO_MODEL_PATH = os.environ.get(
+    "YOLO_MODEL_PATH",
+    r"E:\CCPD2019\CCPD2019\YOLOv8_finetuned\finetune_ccpd2019_fixed\weights\best.pt",
+)
 
 # 输出目录
-OUTPUT_DIR = r"C:\Users\32044\Desktop\xunlianrcnn"
+OUTPUT_DIR = os.environ.get("OUTPUT_DIR", r"C:\Users\32044\Desktop\xunlianrcnn")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 logger.info(f"输出目录: {OUTPUT_DIR}")
 

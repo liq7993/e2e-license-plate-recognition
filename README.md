@@ -171,7 +171,7 @@ python zhongduan.py
 
 ## 训练流程
 
-> ⚠️ **重要提示**：当前训练脚本中的数据集路径、输出目录是按作者本机环境硬编码的（`E:\CCPD2019`、`E:\BLPD`、`C:\Users\32044\Desktop\xunlianrcnn` 等）。第三方使用前**必须**按下文修改。
+> ℹ️ **路径配置方式**：训练脚本里的数据集路径、输出目录默认仍指向作者本机（`E:\CCPD2019`、`E:\BLPD`、`C:\Users\32044\Desktop\xunlianrcnn` 等）作占位，第三方使用时**通过下表的环境变量覆盖**即可，**不必再改源码**。
 
 ### 1. 数据集
 
@@ -182,41 +182,60 @@ python zhongduan.py
 
 数据集请自行从原始发布渠道获取，不在本仓库内分发。
 
-### 2. 训练 YOLOv8 检测器
+### 2. 环境变量（覆盖默认路径）
 
-修改 `xunlianres2.py` 中的：
+| 环境变量 | 作用 | 适用脚本 |
+|---|---|---|
+| `YOLO_DATASET_PATH` | YOLO 格式数据集根目录（含 `data.yaml`） | `xunlianres2.py` |
+| `YOLO_INIT_WEIGHTS` | YOLOv8 训练的起始权重（如 `yolov8n.pt`） | `xunlianres2.py` |
+| `YOLO_TRAIN_PROJECT` | YOLOv8 训练输出目录（Ultralytics `project=`） | `xunlianres2.py` |
+| `BLPD_DIR` | BLPD 数据集根目录 | `xunlianzonghe.py` |
+| `BLPD_TRAIN_TXT` | BLPD train 列表，默认 `$BLPD_DIR/train.txt` | `xunlianzonghe.py` |
+| `BLPD_VAL_TXT` | BLPD val 列表，默认 `$BLPD_DIR/val.txt` | `xunlianzonghe.py` |
+| `CCPD_BASE_DIR` | CCPD2019 根目录（脚本内自动拼 `blur/weather/tilt`） | `xunlianzonghe.py` |
+| `YOLO_MODEL_PATH` | 上一阶段训练完成的 YOLOv8 权重，用于裁车牌 | `xunlianzonghe.py` |
+| `OUTPUT_DIR` | 训练产物 / 日志 / 检查点的输出目录 | `xunlianzonghe.py` |
 
-- `dataset_path` → 你本地的 YOLO 格式数据集根目录（须包含 `data.yaml`、`train/images`、`val/images` 等）
-- `model_path` → 起始权重（可用官方 `yolov8n.pt` 等）
-- `project` / `name` → 输出目录
+不设置时使用脚本里写死的默认值。
 
-然后：
+### 3. 训练 YOLOv8 检测器
 
 ```bash
+# Windows PowerShell
+$env:YOLO_DATASET_PATH = "D:\datasets\CCPD2019\yolo_dataset"
+$env:YOLO_INIT_WEIGHTS = "D:\weights\yolov8n.pt"
+$env:YOLO_TRAIN_PROJECT = "D:\runs\plate_detect"
+python xunlianres2.py
+
+# Linux / macOS
+YOLO_DATASET_PATH=/data/CCPD2019/yolo_dataset \
+YOLO_INIT_WEIGHTS=/weights/yolov8n.pt \
+YOLO_TRAIN_PROJECT=/runs/plate_detect \
 python xunlianres2.py
 ```
 
 脚本会训练、验证、并自动导出 ONNX。
 
-### 3. 训练识别模型（渐进式 4 阶段）
-
-修改 `xunlianzonghe.py` 顶部的路径配置：
-
-```python
-BLPD_DIR        = r"E:\BLPD"
-BLPD_TRAIN_TXT  = r"E:\BLPD\train.txt"
-BLPD_VAL_TXT    = r"E:\BLPD\val.txt"
-CCPD_BASE_DIR   = r"E:\CCPD2019\CCPD2019"
-YOLO_MODEL_PATH = r"...\YOLOv8_finetuned\...\best.pt"
-OUTPUT_DIR      = r"C:\Users\32044\Desktop\xunlianrcnn"
-```
-
-启动训练：
+### 4. 训练识别模型（渐进式 4 阶段）
 
 ```bash
-# 从头按 4 阶段顺序训练
+# Windows PowerShell
+$env:BLPD_DIR = "D:\datasets\BLPD"
+$env:CCPD_BASE_DIR = "D:\datasets\CCPD2019"
+$env:YOLO_MODEL_PATH = "D:\runs\plate_detect\exp\weights\best.pt"
+$env:OUTPUT_DIR = "D:\runs\plate_recog"
 python xunlianzonghe.py
 
+# Linux / macOS
+BLPD_DIR=/data/BLPD CCPD_BASE_DIR=/data/CCPD2019 \
+YOLO_MODEL_PATH=/runs/plate_detect/exp/weights/best.pt \
+OUTPUT_DIR=/runs/plate_recog \
+python xunlianzonghe.py
+```
+
+支持的命令行参数：
+
+```bash
 # 仅从某阶段开始
 python xunlianzonghe.py --stage 3
 
@@ -332,7 +351,7 @@ DIGITS    (10) : 0-9
 
 这部分为本项目作为毕业设计开源版本时的诚实边界，**不回避**：
 
-1. **绝对路径硬编码**：`xunlianzonghe.py` / `xunlianres2.py` 中的数据集路径、输出路径仍为作者本机的 `E:\` `C:\` 路径，第三方运行训练需要先改代码或后续抽出 YAML 配置。
+1. **路径默认值仍是作者本机**：`xunlianzonghe.py` / `xunlianres2.py` 已支持通过环境变量覆盖路径（见上方表格），但脚本里的默认值仍是作者本机的 `E:\` `C:\` 路径。后续可考虑抽 YAML 配置进一步规整。
 2. **依赖未锁版本**：`requirements.txt` 仅列了包名，未来需要 `pip freeze` 出一份能复现的版本快照。
 3. **识别端缺统一 benchmark**：尚未提供脚本化的字符级 / 序列级准确率统计，README 中也因此没有给识别准确率数字。
 4. **无单元测试 / 集成测试**。
