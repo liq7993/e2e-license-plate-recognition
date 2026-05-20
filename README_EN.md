@@ -1,5 +1,11 @@
 # End-to-End Chinese License Plate Recognition
 
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c.svg)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-AGPL--3.0-orange.svg)](https://github.com/ultralytics/ultralytics)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)](#environment)
+
 > Undergraduate capstone project · A two-stage recognition system for Chinese license plates
 >
 > `YOLOv8 detection` + `STN + MobileNetV3 + Attention + Deblur + BiLSTM + CTC` recognition + `Tkinter` GUI
@@ -48,6 +54,8 @@ flowchart LR
 
 Every intermediate result on this chain — detection box, cropped plate, STN-rectified image, deblur reconstruction, feature maps — is rendered in the GUI, which makes the project easy to demo and debug.
 
+> 📷 Screenshots and end-to-end pipeline figures live in [`docs/screenshots/`](docs/screenshots/) (placeholder — see the README inside that directory for suggested contents).
+
 ---
 
 ## Highlights
@@ -72,8 +80,10 @@ end-to-end/
 ├── README.md                # Chinese README
 ├── README_EN.md             # This file
 ├── LICENSE                  # MIT (with notes on upstream licenses)
-├── requirements.txt         # Python dependencies (versions not pinned yet)
+├── requirements.txt         # Python dependencies (soft-pinned with ~= / >=)
+├── CITATION.cff             # GitHub "Cite this repository" metadata
 ├── .gitignore
+├── .gitattributes           # Force LF line endings, mark binary types
 │
 ├── zhongduan.py             # Inference + Tkinter GUI (runnable)
 ├── xunlianzonghe.py         # Recognition training (4-stage progressive)
@@ -86,6 +96,9 @@ end-to-end/
 │   └── chars_mapping.json   #   Character ↔ index mapping
 │
 ├── samples/                 # Demo images (no images bundled by default — see the README inside)
+│   └── README.md
+│
+├── docs/screenshots/        # Project screenshots / pipeline figures (placeholder)
 │   └── README.md
 │
 └── runs/

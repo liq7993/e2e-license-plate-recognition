@@ -1,6 +1,34 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+YOLOv8 车牌检测训练脚本
+======================
+
+在 YOLO 格式的中文车牌数据集上微调 Ultralytics YOLOv8，
+训练完成后自动验证并导出 ONNX，作为下游识别模型 (CRNN) 的车牌裁剪上游。
+
+用法
+----
+    python xunlianres2.py
+
+所有数据集 / 权重 / 输出路径都通过 **环境变量** 覆盖，无需改源码：
+
+    YOLO_DATASET_PATH   YOLO 格式数据集根目录（含 data.yaml / train/ / val/）
+    YOLO_INIT_WEIGHTS   起始权重（官方 yolov8n.pt 或上一轮训练的 best.pt）
+    YOLO_TRAIN_PROJECT  Ultralytics 训练输出根目录（runs 上一级）
+
+未设置时使用脚本中保留的默认值（仅作占位）。
+
+依赖
+----
+- ultralytics >= 8.1
+- torch / torchvision，CUDA-capable GPU 推荐
+"""
+
 from ultralytics import YOLO
 import os
 import torch.multiprocessing as mp
+
 
 def main():
     # 首先检查数据集文件夹是否存在

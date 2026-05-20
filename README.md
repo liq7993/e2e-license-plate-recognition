@@ -1,5 +1,11 @@
 # 端到端中文车牌识别系统 (End-to-End Chinese License Plate Recognition)
 
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-ee4c2c.svg)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-AGPL--3.0-orange.svg)](https://github.com/ultralytics/ultralytics)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)](#环境与依赖)
+
 > 本科毕业设计开源版本 · 面向中文车牌场景的两阶段识别系统
 >
 > `YOLOv8 检测` + `STN + MobileNetV3 + Attention + Deblur + BiLSTM + CTC` 识别 + `Tkinter` 可视化 GUI
@@ -48,6 +54,8 @@ flowchart LR
 
 链路上每一个中间结果（检测框、裁剪后的车牌、STN 仿射校正后的图像、去模糊分支输出、特征图）都会在 GUI 上显示，便于讲解与调试。
 
+> 📷 运行截图与端到端流程示意图存放于 [`docs/screenshots/`](docs/screenshots/)（待补；目录内 README 说明了建议放置的内容）。
+
 ---
 
 ## 主要特性
@@ -72,8 +80,10 @@ end-to-end/
 ├── README.md                # 本文档（中文）
 ├── README_EN.md             # 英文版 README
 ├── LICENSE                  # MIT 许可（含第三方上游许可提示）
-├── requirements.txt         # Python 依赖（未锁版本）
+├── requirements.txt         # Python 依赖（已用 ~= / >= 软锁主版本）
+├── CITATION.cff             # GitHub「Cite this repository」元数据
 ├── .gitignore
+├── .gitattributes           # 统一 LF 行尾、二进制类型标注
 │
 ├── zhongduan.py             # 推理 + Tkinter GUI 程序（可直接运行）
 ├── xunlianzonghe.py         # 识别模型训练（4 阶段渐进式）
@@ -86,6 +96,9 @@ end-to-end/
 │   └── chars_mapping.json   #   字符 ↔ 索引映射
 │
 ├── samples/                 # 演示用的示例图片目录（默认不内置图片，见目录内 README）
+│   └── README.md
+│
+├── docs/screenshots/        # 项目截图 / 流程示意图（待补，见目录内 README）
 │   └── README.md
 │
 └── runs/

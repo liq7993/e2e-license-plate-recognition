@@ -1,12 +1,23 @@
-torch
-torchvision
-ultralytics
-opencv-python
-Pillow
-matplotlib
-tqdm
-tensorboard
-scikit-image
-numpy
-pyyaml
+# 主要软件栈 —— 用最低主版本约束，方便复现又不至于绑死小版本。
+# CUDA 版本由你本机 torch wheel 决定，与本文件无关。
+# 如需更严格的复现快照，请在你的环境跑 `pip freeze > requirements-lock.txt`。
 
+torch>=2.0,<3.0
+torchvision>=0.15
+ultralytics>=8.1,<9.0
+
+# 图像 / 数据处理
+opencv-python>=4.5
+Pillow>=9.0
+scikit-image>=0.19
+
+# numpy 2.x 与上游 torch/opencv 仍在兼容磨合期，先锁 1.x
+numpy>=1.21,<2.0
+
+# 训练辅助 / 可视化
+matplotlib>=3.5
+tqdm>=4.60
+tensorboard>=2.10
+
+# 配置
+pyyaml>=6.0

@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: "End-to-End Chinese License Plate Recognition"
+message: "如果本仓库对你的学习或论文有帮助，欢迎按以下信息引用。"
+type: software
+authors:
+  - family-names: Li
+    given-names: Qian
+    email: 3204425573@qq.com
+repository-code: "https://github.com/liq7993/e2e-license-plate-recognition"
+url: "https://github.com/liq7993/e2e-license-plate-recognition"
+abstract: >-
+  An end-to-end Chinese license-plate recognition system: YOLOv8 detector
+  + a custom enhanced CRNN (STN, MobileNetV3-Small, channel/spatial
+  attention, deblur auxiliary branch, BiLSTM, CTC) with a Tkinter
+  visualization GUI and a four-stage progressive training framework.
+  Released as an undergraduate capstone open-source reference.
+keywords:
+  - license plate recognition
+  - LPR
+  - ALPR
+  - Chinese license plate
+  - YOLOv8
+  - CRNN
+  - CTC
+  - STN
+  - PyTorch
+license: MIT
+version: "1.0.0"
+date-released: "2025-05-20"

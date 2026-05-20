@@ -1,3 +1,55 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+端到端车牌识别 —— 4 阶段渐进式训练脚本
+=======================================
+
+在 CCPD2019 / CCPD2020 + BLPD 数据集上训练 EnhancedCRNN：
+    STN  +  MobileNetV3-Small  +  Channel/Spatial Attention
+         +  Deblur 辅助分支    +  BiLSTM + CTC
+
+通过分阶段引入难任务（基础 CRNN → +STN → +Deblur → 联合微调），
+避免一次性堆叠模块导致训练不稳。
+
+用法
+----
+    # 完整 4 阶段顺序训练
+    python xunlianzonghe.py
+
+    # 从第 3 阶段开始
+    python xunlianzonghe.py --stage 3
+
+    # 从最近的检查点恢复
+    python xunlianzonghe.py --resume
+
+    # 限制最长训练时间（分钟）
+    python xunlianzonghe.py --max-train-time 480
+
+    # 设定每天自动暂停时间
+    python xunlianzonghe.py --pause-time 23:00
+
+也可以创建 pause_training.txt 文件，让训练在下一个 epoch 边界安全停止。
+
+路径配置
+--------
+全部通过 **环境变量** 覆盖，无需改源码：
+
+    BLPD_DIR / BLPD_TRAIN_TXT / BLPD_VAL_TXT
+    CCPD_BASE_DIR
+    YOLO_MODEL_PATH      # 用于在 CCPD 上裁车牌的 YOLOv8 权重
+    OUTPUT_DIR           # 训练产物 / 日志 / 检查点输出目录
+
+详见仓库 README 中的「环境变量」对照表。
+
+输出
+----
+- stageX_best_model.pth        每阶段最佳权重
+- stageX_checkpoint_epoch_K.pth 中断恢复用
+- chars_mapping.json            字符 ↔ 索引映射（推理时必需）
+- logs/                         TensorBoard 日志
+- end_to_end_lpr.log            训练日志
+"""
+
 import os
 import sys
 import time

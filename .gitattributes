@@ -1,0 +1,15 @@
+# 统一使用 LF 换行；checkout 时根据平台可还原
+* text=auto eol=lf
+
+# 明确以二进制处理的文件类型（避免 git 试图做文本规范化）
+*.pt    binary
+*.pth   binary
+*.onnx  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.bmp   binary
+*.ico   binary
+*.pdf   binary

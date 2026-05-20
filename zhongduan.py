@@ -413,8 +413,17 @@ class LicensePlateRecognitionSystem:
             
             # 加载车牌识别模型
             if os.path.exists(LPR_MODEL_PATH):
-                model_info = torch.load(LPR_MODEL_PATH, map_location=device)
-                
+                # weights_only=True：PyTorch 2.6+ 默认行为，
+                # 拒绝反序列化任意 pickle 对象、只接受张量。
+                # 我们保存的 checkpoint 是 {'model_state_dict': tensor_dict}，安全兼容。
+                # 老版本 PyTorch 不认识这个参数则回退到不传，保持向后兼容。
+                try:
+                    model_info = torch.load(
+                        LPR_MODEL_PATH, map_location=device, weights_only=True
+                    )
+                except TypeError:
+                    model_info = torch.load(LPR_MODEL_PATH, map_location=device)
+
                 # 创建模型实例
                 self.lpr_model = EnhancedCRNN(
                     num_classes=self.num_classes,
