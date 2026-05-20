@@ -54,7 +54,9 @@ flowchart LR
 
 链路上每一个中间结果（检测框、裁剪后的车牌、STN 仿射校正后的图像、去模糊分支输出、特征图）都会在 GUI 上显示，便于讲解与调试。
 
-> 📷 运行截图与端到端流程示意图存放于 [`docs/screenshots/`](docs/screenshots/)（待补；目录内 README 说明了建议放置的内容）。
+> 📊 训练曲线总览见 [训练产物与已验证指标](#训练产物与已验证指标)。
+> 📷 GUI 运行截图与流程示意图占位于 [`docs/screenshots/`](docs/screenshots/)，
+>    需要本地跑一遍 `python zhongduan.py` 后自行截图补入（避免泄露真实车牌）。
 
 ---
 
@@ -316,6 +318,18 @@ runs/detect/train/
 | Recall (B)    | 0.9909 |
 | **mAP@0.5**       | **0.9940** |
 | **mAP@0.5:0.95**  | **0.7737** |
+
+训练曲线总览（从 `runs/detect/train/results.csv` 重新绘制；
+脚本见 [`docs/screenshots/_gen_training_overview.py`](docs/screenshots/_gen_training_overview.py)）：
+
+![训练总览](docs/screenshots/training_overview.png)
+
+按类别的混淆矩阵（来自 Ultralytics 原始训练产物）：
+
+<p align="center">
+  <img src="runs/detect/train/confusion_matrix_normalized.png" alt="normalized confusion matrix" width="48%" />
+  <img src="runs/detect/train/PR_curve.png" alt="PR curve" width="48%" />
+</p>
 
 > 识别端（CRNN）当前**仓库内未附带统一的 benchmark 脚本**，因此不在 README 中给出具体的字符 / 序列准确率数字。这是一个待补的工程项，详见 [Roadmap](#roadmap)。
 

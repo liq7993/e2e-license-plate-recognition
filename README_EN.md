@@ -54,7 +54,8 @@ flowchart LR
 
 Every intermediate result on this chain — detection box, cropped plate, STN-rectified image, deblur reconstruction, feature maps — is rendered in the GUI, which makes the project easy to demo and debug.
 
-> 📷 Screenshots and end-to-end pipeline figures live in [`docs/screenshots/`](docs/screenshots/) (placeholder — see the README inside that directory for suggested contents).
+> 📊 Training-curve overview is shown in [Artifacts and Verified Metrics](#artifacts-and-verified-metrics).
+> 📷 GUI screenshots are still a placeholder under [`docs/screenshots/`](docs/screenshots/) — run `python zhongduan.py` locally and drop your own (mask or use CCPD/BLPD plates).
 
 ---
 
@@ -316,6 +317,18 @@ Final epoch (20) metrics from `results.csv`:
 | Recall (B)    | 0.9909 |
 | **mAP@0.5**       | **0.9940** |
 | **mAP@0.5:0.95**  | **0.7737** |
+
+Training curves regenerated from `runs/detect/train/results.csv`
+(script: [`docs/screenshots/_gen_training_overview.py`](docs/screenshots/_gen_training_overview.py)):
+
+![training overview](docs/screenshots/training_overview.png)
+
+Per-class confusion matrix and PR curve (from the original Ultralytics artifacts):
+
+<p align="center">
+  <img src="runs/detect/train/confusion_matrix_normalized.png" alt="normalized confusion matrix" width="48%" />
+  <img src="runs/detect/train/PR_curve.png" alt="PR curve" width="48%" />
+</p>
 
 > The recognition side (CRNN) does **not** ship a unified benchmark script in this repo, so character / sequence accuracy numbers are intentionally **not** reported here. This is tracked in [Roadmap](#roadmap).
 
